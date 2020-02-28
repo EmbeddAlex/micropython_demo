@@ -1,22 +1,15 @@
 from machine import Pin, I2C
 import BME280
 import network
-import urequests
 import socket
-import esp
-
-from page import web_page
-from secret import SSID, PASSWD
-
-esp.osdebug(None)
-
 import gc
 
-gc.collect()
+from page import web_page
 
-station = network.WLAN(network.STA_IF)
+gc.enable()
+station = network.WLAN(network.AP_IF)
 station.active(True)
-station.connect(SSID, PASSWD)
+station.config(authmode=0, essid='MicroPython')
 
 while not station.isconnected():
     pass
@@ -42,20 +35,15 @@ s.listen(5)
 
 while True:
     try:
-        if gc.mem_free() < 102000:
-            gc.collect()
         conn, addr = s.accept()
         conn.settimeout(3.0)
-        print('Got a connection from %s' % str(addr))
+        print('Got a connection from {}'.format(addr))
         request = conn.recv(1024)
         conn.settimeout(None)
-        request = str(request)
-        print('Content = %s' % request)
-        response = web_page()
-        conn.send('HTTP/1.1 200 OK\n')
-        conn.send('Content-Type: text/html\n')
-        conn.send('Connection: close\n\n')
-        conn.sendall(response)
+        conn.send(b'HTTP/1.1 200 OK\n')
+        conn.send(b'Content-Type: text/html\n')
+        conn.send(b'Connection: close\n\n')
+        conn.sendall(web_page(bme))
         conn.close()
     except OSError as e:
         conn.close()

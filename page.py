@@ -1,4 +1,4 @@
-def web_page():
+def web_page(bme):
     return """<html><head><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="refresh" content="10">
   <link rel="icon" href="data:,"><style>body { text-align: center; font-family: "Trebuchet MS", Arial;}
